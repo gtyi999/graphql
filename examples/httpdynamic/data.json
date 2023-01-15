@@ -2,14 +2,46 @@
   {
     "id": "1",
     "name": "Dan",
-    "surname": "Jones"
+    "surname": "Jones",
+    "friends": [
+      {
+        "fName": "friendName 1111",
+        "fAge": 20
+      },
+      {
+        "fName": "friendName 22222",
+        "fAge": 21
+      }
+    ]
   },
   {
     "id": "2",
-    "name": "Lee"
+    "name": "Lee",
+    "surname": "Lee222",
+    "friends": [
+      {
+        "fName": "friendName 3333",
+        "fAge": 20
+      },
+      {
+        "fName": "friendName 4444",
+        "fAge": 21
+      }
+    ]
   },
   {
     "id": "3",
-    "name": "Nick"
+    "name": "Nick",
+    "surname": "Nick333",
+    "friends": [
+      {
+        "fName": "friendName 555",
+        "fAge": 20
+      },
+      {
+        "fName": "friendName 6666",
+        "fAge": 21
+      }
+    ]
   }
 ]

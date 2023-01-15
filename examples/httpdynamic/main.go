@@ -48,6 +48,7 @@ func filterUser(data []map[string]interface{}, args map[string]interface{}) map[
 }
 
 func executeQuery(query string, schema graphql.Schema) *graphql.Result {
+
 	result := graphql.Do(graphql.Params{
 		Schema:        schema,
 		RequestString: query,
@@ -75,12 +76,14 @@ func importJSONDataFromFile(fileName string) error {
 	args := make(graphql.FieldConfigArgument)
 	for _, item := range data {
 		for k := range item {
+
 			fields[k] = &graphql.Field{
 				Type: graphql.String,
 			}
 			args[k] = &graphql.ArgumentConfig{
 				Type: graphql.String,
 			}
+
 		}
 	}
 
