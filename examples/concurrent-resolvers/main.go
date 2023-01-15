@@ -8,16 +8,53 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-type Foo struct {
-	Name string `json:"name"`
-	Age  int     `json:"age"`
+type Student struct {
+	StuName string `json:"stu_name"`
+	StuAge  int    `json:"stu_age"`
 }
 
-var FieldFooType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "Foo",
+var FieldStudentType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Student",
 	Fields: graphql.Fields{
-		"name": &graphql.Field{Type: graphql.String},
-		"age": &graphql.Field{Type: graphql.String},
+		"stu_name": &graphql.Field{Type: graphql.String},
+		"stu_age": &graphql.Field{Type: graphql.String},
+	},
+})
+
+//班级
+type ClassType struct {
+	ClassName string `json:"class_name"`
+	ClassNum  int    `json:"class_num"` //级别人数
+	Students   []Student  `json:"students"` //学生
+
+}
+
+var FieldClassType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "ClassType",
+	Fields: graphql.Fields{
+		"class_name": &graphql.Field{Type: graphql.String},
+		"class_num": &graphql.Field{Type: graphql.String},
+		"students" : &graphql.Field{
+			Type: graphql.NewList(FieldStudentType),
+		},
+	},
+})
+
+
+type School struct {
+	SchoolName string `json:"school_name"`
+	SchoolAge  int     `json:"sch_age"`
+	ClassList  []ClassType  `json:"class_list"`
+}
+
+var FieldSchoolType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "School",
+	Fields: graphql.Fields{
+		"school_name": &graphql.Field{Type: graphql.String},
+		"sch_age": &graphql.Field{Type: graphql.String},
+		"class_list": &graphql.Field{
+			Type: graphql.NewList(FieldClassType),
+		},
 	},
 })
 
@@ -32,18 +69,56 @@ var FieldBarType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+
 // QueryType fields: `concurrentFieldFoo` and `concurrentFieldBar` are resolved
 // concurrently because they belong to the same field-level and their `Resolve`
 // function returns a function (thunk).
 var QueryType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Query",
 	Fields: graphql.Fields{
-		"concurrentFieldFoo": &graphql.Field{
-			Type: FieldFooType,
+		"FieldSchool": &graphql.Field{
+			Type: graphql.NewList(FieldSchoolType), //表示返回数组类型
+			//Type: FieldSchoolType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				var foo = Foo{Name: "Foo's name", Age: 14}
+
+				schools := make([]*School,0)
+				var foo1 = School{
+					SchoolName: "xx school",
+					SchoolAge: 14,
+					ClassList: []ClassType{
+						{
+							ClassName: "中一班",
+							ClassNum:  18,
+							Students: []Student{
+								{
+									StuName: "guanzilin",
+									StuAge:  5,
+								},
+
+							},
+						},
+					},
+				}
+				var foo2 = School{
+					SchoolName: "YY school",
+					SchoolAge: 15,
+					ClassList: []ClassType{
+						{
+							ClassName: "中一班",
+							ClassNum:  19,
+							Students: []Student{
+								{
+									StuName: "guanzilin22",
+									StuAge:  6,
+								},
+							},
+						},
+					},
+				}
+                schools = append(schools,&foo1)
+                schools = append(schools,&foo2)//如果返回多个的话 也就是数组
 				return func() (interface{}, error) {
-					return &foo, nil
+					return schools, nil
 				}, nil
 			},
 		},
@@ -87,7 +162,6 @@ func main() {
 	//	query {
 	//		concurrentFieldFoo {
 	//			name
-    //            age
 	//		}
 	//		concurrentFieldBar {
 	//			name
@@ -97,9 +171,17 @@ func main() {
 
 	query := `
 		query {
-			concurrentFieldFoo {
-				name
-                age
+			FieldSchool {
+				school_name
+                sch_age
+                class_list {
+	                class_name
+	                class_num
+                    students {
+                       stu_name
+                       stu_age
+                    }
+                }
 			}
             name
 		}
